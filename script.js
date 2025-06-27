@@ -2,10 +2,12 @@ const form = document.getElementById("item-form");
 const input = document.getElementById("item-input");
 const itemsList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
+const filterInput = document.getElementById("filter");
 
 //function to add item to the list
 function addItem(e) {
   e.preventDefault();
+
   let inputValue = input.value;
 
   if (inputValue === "") {
@@ -23,8 +25,9 @@ function addItem(e) {
   // appending the list item to the unordered list
   itemsList.appendChild(item);
 
+  checkUI();
+
   input.value = "";
-  console.log(inputValue);
 }
 
 function createButton(classes) {
@@ -46,17 +49,34 @@ function createIcon(classes) {
 //Remove item from the list
 function removeItem(e) {
   if (e.target.tagName === "I") {
-    const removedItem = e.target.parentElement.parentElement;
-    removedItem.remove();
+    if (window.confirm("Are you sure?")) {
+      const removedItem = e.target.parentElement.parentElement;
+      removedItem.remove();
+      checkUI();
+    }
   }
 }
 
-// Clearing all the items in the list`
+// Clearing all the items in the list
 function clearList() {
   //   itemsList.textContent = "";
   // Another way
   while (itemsList.firstElementChild) {
     itemsList.removeChild(itemsList.firstElementChild);
+  }
+
+  checkUI();
+}
+
+// to reset the UI if no more items are present in the list
+function checkUI() {
+  const items = itemsList.querySelectorAll("li");
+  if (items.length === 0) {
+    filterInput.style.display = "none";
+    clearBtn.style.display = "none";
+  } else {
+    filterInput.style.display = "block";
+    clearBtn.style.display = "block";
   }
 }
 
@@ -64,3 +84,6 @@ function clearList() {
 form.addEventListener("submit", addItem);
 itemsList.addEventListener("click", removeItem);
 clearBtn.addEventListener("click", clearList);
+
+// this function runs only once when the script loads
+checkUI();
