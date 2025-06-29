@@ -68,6 +68,30 @@ function clearList() {
   checkUI();
 }
 
+// filter functionality
+function filterItems(e) {
+  const text = e.target.value.toLowerCase();
+  const items = itemsList.querySelectorAll("li");
+
+  for (const item of items) {
+    const itemName = item.textContent.toLowerCase();
+
+    // one way of applying the condition
+    // if (!itemName.includes(text)) {
+    //   item.classList.add("hidden");
+    // } else {
+    //   item.classList.remove("hidden");
+    // }
+
+    // another way
+    if (itemName.indexOf(text) !== -1) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  }
+}
+
 // to reset the UI if no more items are present in the list
 function checkUI() {
   const items = itemsList.querySelectorAll("li");
@@ -84,6 +108,7 @@ function checkUI() {
 form.addEventListener("submit", addItem);
 itemsList.addEventListener("click", removeItem);
 clearBtn.addEventListener("click", clearList);
+filterInput.addEventListener("keyup", filterItems);
 
 // this function runs only once when the script loads
 checkUI();
