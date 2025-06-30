@@ -5,29 +5,55 @@ const clearBtn = document.getElementById("clear");
 const filterInput = document.getElementById("filter");
 
 //function to add item to the list
-function addItem(e) {
+function onAddItemSubmit(e) {
   e.preventDefault();
 
-  let inputValue = input.value;
+  let newItem = input.value;
 
-  if (inputValue === "") {
+  // validate input
+  if (newItem === "") {
     alert("Please add some item");
     return;
   }
 
-  const item = document.createElement("li");
-  const text = document.createTextNode(inputValue);
-  item.appendChild(text);
+  // Adding the item to the DOM
+  addItemToDOM(newItem);
 
-  const button = createButton("remove-item btn-link text-red");
-  item.appendChild(button);
-
-  // appending the list item to the unordered list
-  itemsList.appendChild(item);
+  // Adding item to the storage
+  addItemToStorage(newItem);
 
   checkUI();
 
   input.value = "";
+}
+
+function addItemToDOM(item) {
+  const li = document.createElement("li");
+  const text = document.createTextNode(item);
+  li.appendChild(text);
+
+  const button = createButton("remove-item btn-link text-red");
+  li.appendChild(button);
+
+  // appending the list item to the unordered list
+  itemsList.appendChild(li);
+}
+
+function addItemToStorage(item) {
+  let itemsFromStorage;
+
+  if (localStorage.getItem("items") === null) {
+    // if there are no items in the storage
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
+
+  // Adding new item to the array
+  itemsFromStorage.push(item);
+
+  // converting the array into a JSON string and adding it to the storage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
 function createButton(classes) {
@@ -105,7 +131,7 @@ function checkUI() {
 }
 
 // Event Listeners
-form.addEventListener("submit", addItem);
+form.addEventListener("submit", onAddItemSubmit);
 itemsList.addEventListener("click", removeItem);
 clearBtn.addEventListener("click", clearList);
 filterInput.addEventListener("keyup", filterItems);
