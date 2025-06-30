@@ -3,6 +3,9 @@ const input = document.getElementById("item-input");
 const itemsList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const filterInput = document.getElementById("filter");
+const formBtn = form.querySelector("button");
+
+let isEditMode = false;
 
 function displayItems() {
   const itemsFromStorage = getItemsFromStorage();
@@ -11,7 +14,7 @@ function displayItems() {
     addItemToDOM(item);
   });
 
-  checkUI();
+  resetUI();
 }
 
 //function to add item to the list
@@ -26,13 +29,23 @@ function onAddItemSubmit(e) {
     return;
   }
 
+  // check for edit mode
+  if (isEditMode) {
+    const itemToEdit = itemsList.querySelector(".edit-mode");
+
+    removeItemFromStorage(itemToEdit.textContent);
+    itemToEdit.classList.remove("edit-mode");
+    itemToEdit.remove();
+    isEditMode = false;
+  }
+
   // Adding the item to the DOM
   addItemToDOM(newItem);
 
   // Adding item to the storage
   addItemToStorage(newItem);
 
-  checkUI();
+  resetUI();
 
   input.value = "";
 }
@@ -90,7 +103,25 @@ function getItemsFromStorage() {
 function onClickItem(e) {
   if (e.target.tagName === "I") {
     removeItem(e.target.parentElement.parentElement);
+  } else {
+    setItemToEdit(e.target);
   }
+}
+
+// edit item functionality
+function setItemToEdit(item) {
+  isEditMode = true;
+
+  const items = itemsList.querySelectorAll("li");
+  items.forEach((i) => i.classList.remove("edit-mode"));
+
+  item.classList.add("edit-mode");
+
+  formBtn.innerHTML = "<i class='fa-solid fa-pen'></i> Update Item";
+  formBtn.classList.add("update-btn");
+
+  // putting the item to update in the input field
+  input.value = item.textContent;
 }
 
 //Remove item from the DOM and storage
@@ -101,7 +132,7 @@ function removeItem(item) {
 
     // remove item from storage
     removeItemFromStorage(item.textContent);
-    checkUI();
+    resetUI();
   }
 }
 
@@ -127,7 +158,7 @@ function clearList() {
   // clear from the local storage
   localStorage.removeItem("items");
 
-  checkUI();
+  resetUI();
 }
 
 // filter functionality
@@ -155,7 +186,9 @@ function filterItems(e) {
 }
 
 // to reset the UI if no more items are present in the list
-function checkUI() {
+function resetUI() {
+  input.value = "";
+
   const items = itemsList.querySelectorAll("li");
   if (items.length === 0) {
     filterInput.style.display = "none";
@@ -164,6 +197,11 @@ function checkUI() {
     filterInput.style.display = "block";
     clearBtn.style.display = "block";
   }
+
+  formBtn.innerHTML = "<i class='fa-solid fa-plus'></i> Add Item";
+  formBtn.classList.remove("update-btn");
+
+  isEditMode = false;
 }
 
 // Initialize app
@@ -176,7 +214,7 @@ function init() {
   window.addEventListener("DOMContentLoaded", displayItems);
 
   // this function runs only once when the script loads
-  checkUI();
+  resetUI();
 }
 
 init();
